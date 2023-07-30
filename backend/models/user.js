@@ -28,19 +28,19 @@ const userSchema = new mongoose.Schema({
     enum: ["M", "F"],
     required: true,
   },
-  trips: [
+  itineraries: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Itinerary",
     },
   ],
-  favourite: [
+  favourites: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Place",
     },
   ],
-  review: [
+  reviews: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Place",
