@@ -26,8 +26,15 @@ const errorHandler = (error, response, next) => {
   next(error);
 };
 
+//try catch and aync-await || use promise
+
+const bigPromise = (func) => (req, res, next) => {
+  Promise.resolve(func(req, res, next)).catch(next);
+};
+
 module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  bigPromise,
 };
