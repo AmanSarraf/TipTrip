@@ -18,6 +18,7 @@ const tokenExtractor = (request, response, next) => {
   }
   next();
 };
+
 const userExtractor = async (request, response, next) => {
   if (request.token) {
     const decodedToken = jwt.verify(request.token, config.SECRET);

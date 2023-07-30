@@ -6,13 +6,15 @@ const placeSchema = new mongoose.Schema({
   reviews: {
     type: [
       {
-        user: { type: String, require: true },
+        userName: { type: String, require: true },
+        userEmail: { type: String, require: true },
         rating: { type: Number, require: true, min: 0, max: 5 },
         comment: { type: String },
       },
     ],
     default: [],
   },
+
   favourites: {
     type: Number,
     default: 0,
