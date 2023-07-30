@@ -3,6 +3,8 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 
+const placesRouter = require("./controllers/places");
+
 const middleware = require("./utils/middleware");
 const logger = require("./utils/logger");
 const config = require("./utils/config");
@@ -26,7 +28,7 @@ app.use(cors());
 app.use(express.static("build"));
 app.use(express.json());
 
-// Use controllers router here
+app.use("/api/places", placesRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
