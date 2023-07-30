@@ -1,20 +1,20 @@
-const middleware = require("../utils/middleware");
 const User = require("../model/user");
+const userRouter = require("express").Router();
 
-exports.signup = middleware.bigPromise(async (req, res) => {
+userRouter.post("/", async (request, response) => {
   console.log("post route is running");
-  const { name, email, password, gender } = req.body;
+  const { name, email, password, gender } = request.body;
   if (name && email && password) {
-    res.send("ok");
+    response.send("ok");
     console.log("your name is " + name);
   }
   if (!email || !name || !password) {
-    return res.status(401).json({
+    return response.status(401).json({
       message: "please enter all fields",
     });
   }
 
-  console.log(req.body);
+  console.log(request.body);
 
   const user = await User.create({
     name,
@@ -23,15 +23,19 @@ exports.signup = middleware.bigPromise(async (req, res) => {
     gender,
   });
 
-  const token = user.getJwtToken();
-  const options = {
-    expires: new Date(Date.now() + 3 * 20 * 60 * 60 * 1000),
-    httpOnly: true,
-  };
+  console.log(user);
 
-  res.status(200).cookie("token", token, options).json({
-    sucess: true,
-    token,
-    user,
-  });
+  // const token = user.getJwtToken();
+  // const options = {
+  //   expiresponse: new Date(Date.now() + 3 * 20 * 60 * 60 * 1000),
+  //   httpOnly: true,
+  // };
+
+  // response.status(200).cookie("token", token, options).json({
+  //   sucess: true,
+  //   token,
+  //   user,
+  // });
 });
+
+module.exports = userRouter;
