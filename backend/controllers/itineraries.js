@@ -8,15 +8,17 @@ itineraryRouter.get("/", async (request, response) => {
 });
 
 itineraryRouter.post("/", async (request, response) => {
+  // Check if user login
   const user = request.user;
-  if (user === null) {
+  if (user === undefined) {
     return response.status(401).json({ error: "token invalid" });
   }
 
   // Add Itinerary
-  const { source, destination, dateFrom, dateTo, purpose, comment } =
-    request.body;
+  const { dateFrom, dateTo, purpose, comment } = request.body;
 
+  const source = request.body.source.toLowerCase();
+  const destination = request.body.destination.toLowerCase();
   if (source === destination) {
     return response.status(400).json({
       error: "Source and Destination cannot be same",
@@ -30,24 +32,32 @@ itineraryRouter.post("/", async (request, response) => {
     dateTo,
     purpose,
     comment,
-    user: request.user.id,
+    user: user.id,
   });
 
   const savedItinerary = await itinerary.save();
 
   // Save place
-  const sourcePlace = new Place({
-    cityName: source,
-  });
-  const destinationPlace = new Place({
-    cityName: destination,
-  });
+  const sourceSaved = await Place.findOne({ cityName: source });
+  if (!sourceSaved) {
+    const sourcePlace = new Place({
+      cityName: source,
+    });
+    await sourcePlace.save();
+  }
 
-  await sourcePlace.save();
-  await destinationPlace.save();
+  const destinationSaved = await Place.findOne({ cityName: destination });
+  if (!destinationSaved) {
+    const destinationPlace = new Place({
+      cityName: destination,
+    });
 
-  // Add itinerary in user
-  // - - HERE - -
+    await destinationPlace.save();
+  }
+
+  user.itineraries = user.itineraries.concat(savedItinerary._id);
+  await user.save();
+
   return response.status(201).json(savedItinerary);
 });
 
