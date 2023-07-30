@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 const itinerarySchema = new mongoose.Schema({
   source: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Places",
+    ref: "Place",
     required: true,
   },
   destination: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Places",
+    ref: "Place",
     required: true,
   },
   dateFrom: {
@@ -33,6 +33,11 @@ const itinerarySchema = new mongoose.Schema({
   comment: {
     type: String,
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 itinerarySchema.set("toJSON", {
@@ -43,4 +48,4 @@ itinerarySchema.set("toJSON", {
   },
 });
 
-module.exports = mongoose.model("trip", itinerarySchema);
+module.exports = mongoose.model("Itinerary", itinerarySchema);
