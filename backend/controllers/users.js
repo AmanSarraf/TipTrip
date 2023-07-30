@@ -1,41 +1,35 @@
-const User = require("../models/user");
+const bcrypt = require("bcrypt");
 const userRouter = require("express").Router();
+const User = require("../models/user");
+
+userRouter.get("/", async (request, response) => {
+  const users = await User.find({});
+
+  response.json(users);
+});
 
 userRouter.post("/", async (request, response) => {
-  console.log("post route is running");
   const { name, email, password, gender } = request.body;
-  if (name && email && password) {
-    response.send("ok");
-    console.log("your name is " + name);
-  }
-  if (!email || !name || !password) {
-    return response.status(401).json({
-      message: "please enter all fields",
+
+  if (email == null || name == null || password == null || gender == null) {
+    return response.status(400).json({
+      message: "Please enter all fields",
     });
   }
 
-  console.log(request.body);
+  const saltRounds = 10;
+  const passwordHash = await bcrypt.hash(password, saltRounds);
 
-  const user = await User.create({
+  const user = new User({
     name,
     email,
-    password,
+    passwordHash,
     gender,
   });
 
-  console.log(user);
+  const savedUser = await user.save();
 
-  // const token = user.getJwtToken();
-  // const options = {
-  //   expiresponse: new Date(Date.now() + 3 * 20 * 60 * 60 * 1000),
-  //   httpOnly: true,
-  // };
-
-  // response.status(200).cookie("token", token, options).json({
-  //   sucess: true,
-  //   token,
-  //   user,
-  // });
+  response.status(201).json(savedUser);
 });
 
 module.exports = userRouter;

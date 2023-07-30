@@ -1,10 +1,34 @@
+const config = require("./config");
 const logger = require("./logger");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
 const requestLogger = (request, response, next) => {
   logger.info("Method:", request.method);
   logger.info("Path:  ", request.path);
   logger.info("Body:  ", request.body);
   logger.info("---");
+  next();
+};
+
+const tokenExtractor = (request, response, next) => {
+  const authorization = request.get("authorization");
+  if (authorization && authorization.startsWith("Bearer ")) {
+    request.token = authorization.replace("Bearer ", "");
+  }
+  next();
+};
+const userExtractor = async (request, response, next) => {
+  if (request.token) {
+    const decodedToken = jwt.verify(request.token, config.SECRET);
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: "token invalid" });
+    }
+
+    const user = await User.findById(decodedToken.id);
+    request.user = user;
+  }
+
   next();
 };
 
@@ -26,15 +50,10 @@ const errorHandler = (error, response, next) => {
   next(error);
 };
 
-//try catch and aync-await || use promise
-
-const bigPromise = (func) => (req, res, next) => {
-  Promise.resolve(func(req, res, next)).catch(next);
-};
-
 module.exports = {
   requestLogger,
   unknownEndpoint,
+  tokenExtractor,
+  userExtractor,
   errorHandler,
-  bigPromise,
 };

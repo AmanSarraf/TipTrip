@@ -1,35 +1,52 @@
 const mongoose = require("mongoose");
 
-const tripSchema = new mongoose.Schema(
-  {
-    source: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Places",
-    },
-    destination: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Places",
-    },
-    dateFrom: {
-      type: Date,
-      required: true,
-    },
-    dateTo: {
-      type: Date,
-      required: true,
-    },
-    purpose: {
-      type: String,
-      enum: ["Business", "Religious", "Holiday", "Adventure", "Educational", "Historical"],
-      required: true,
-    },
-    comment: {
-      type: String,
-      required: true,
-    }
+const itinerarySchema = new mongoose.Schema({
+  source: {
+    type: String,
+    required: true,
+  },
+  destination: {
+    type: String,
+    required: true,
+  },
+  dateFrom: {
+    type: Date,
+    required: true,
+  },
+  dateTo: {
+    type: Date,
+    required: true,
+  },
+  purpose: {
+    type: String,
+    enum: [
+      "",
+      "business",
+      "religious",
+      "holiday",
+      "adventure",
+      "educational",
+      "historical",
+    ],
+    default: "",
+  },
+  comment: {
+    type: String,
+    default: "",
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+});
 
-  }
-);
-module.exports = mongoose.model("trip", tripSchema);
+itinerarySchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+module.exports = mongoose.model("Itinerary", itinerarySchema);

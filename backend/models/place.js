@@ -1,27 +1,25 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const placeSchema = new mongoose.Schema({
-  cityName: String,
-  latitude: {
-    type: Number,
-    require: true,
+  cityName: { type: String, unique: true },
+  reviews: {
+    type: [
+      {
+        user: { type: String, require: true },
+        rating: { type: Number, require: true, min: 0, max: 5 },
+        comment: { type: String },
+      },
+    ],
+    default: [],
   },
-  longitude: {
-    type: Number,
-    require: true,
-  },
-  reviews: [
-    {
-      user: { type: String, require: true },
-      rating: { type: Number, require: true, min: 0, max: 5 },
-      comment: { type: String },
-    },
-  ],
   favourites: {
     type: Number,
     default: 0,
   },
 });
+
+placeSchema.plugin(uniqueValidator);
 
 placeSchema.set("toJSON", {
   transform: (document, returnedObject) => {
