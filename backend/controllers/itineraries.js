@@ -1,44 +1,54 @@
 const itineraryRouter = require("express").Router();
+const Place = require("../models/place");
 const Itinerary = require("../models/itinerary");
 
+itineraryRouter.get("/", async (request, response) => {
+  const users = await Itinerary.find({});
+  response.json(users);
+});
+
 itineraryRouter.post("/", async (request, response) => {
-  // Destructre fields from the request body
+  const user = request.user;
+  if (user === null) {
+    return response.status(401).json({ error: "token invalid" });
+  }
+
+  // Add Itinerary
   const { source, destination, dateFrom, dateTo, purpose, comment } =
     request.body;
 
-  // Check if All Details are there or not
-  if (!source || !destination || !dateFrom || !dateTo || !purpose || !comment) {
-    return response.status(403).send({
-      success: false,
-      message: "All Fields are required",
-    });
-  }
   if (source === destination) {
     return response.status(400).json({
-      success: false,
-      message: "Source And Destination Cannot Be Same.",
+      error: "Source and Destination cannot be same",
     });
   }
-  if (dateFrom === dateTo) {
-    return response.status(400).json({
-      success: false,
-      message: "Starting Date And Ending Date is not same.",
-    });
-  }
-  const itinerary = await Itinerary.create({
+
+  const itinerary = new Itinerary({
     source,
     destination,
     dateFrom,
     dateTo,
-    purpose: purpose,
+    purpose,
     comment,
+    user: request.user.id,
   });
 
-  return response.status(200).json({
-    success: true,
-    itinerary,
-    message: "Itinerary created successfully",
+  const savedItinerary = await itinerary.save();
+
+  // Save place
+  const sourcePlace = new Place({
+    cityName: source,
   });
+  const destinationPlace = new Place({
+    cityName: destination,
+  });
+
+  await sourcePlace.save();
+  await destinationPlace.save();
+
+  // Add itinerary in user
+  // - - HERE - -
+  return response.status(201).json(savedItinerary);
 });
 
 module.exports = itineraryRouter;

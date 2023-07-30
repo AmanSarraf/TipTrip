@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -10,7 +11,6 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-
     require: [true, "please provide a email"],
     validate: [validator.isEmail, "Please enter email in correct format"],
     unique: true,
@@ -28,8 +28,6 @@ const userSchema = new mongoose.Schema({
     enum: ["M", "F"],
     required: true,
   },
-  forgotPasswordToken: String,
-  forgotPasswordExpiry: Date,
   trips: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -49,6 +47,8 @@ const userSchema = new mongoose.Schema({
     },
   ],
 });
+
+userSchema.plugin(uniqueValidator);
 
 userSchema.set("toJSON", {
   transform: (document, returnedObject) => {

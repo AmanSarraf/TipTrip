@@ -2,13 +2,11 @@ const mongoose = require("mongoose");
 
 const itinerarySchema = new mongoose.Schema({
   source: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Place",
+    type: String,
     required: true,
   },
   destination: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Place",
+    type: String,
     required: true,
   },
   dateFrom: {
@@ -22,6 +20,7 @@ const itinerarySchema = new mongoose.Schema({
   purpose: {
     type: String,
     enum: [
+      "",
       "business",
       "religious",
       "holiday",
@@ -29,9 +28,11 @@ const itinerarySchema = new mongoose.Schema({
       "educational",
       "historical",
     ],
+    default: "",
   },
   comment: {
     type: String,
+    default: "",
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,

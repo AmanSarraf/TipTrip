@@ -9,7 +9,6 @@ userRouter.get("/", async (request, response) => {
 });
 
 userRouter.post("/", async (request, response) => {
-  console.log("post route is running");
   const { name, email, password, gender } = request.body;
 
   if (email == null || name == null || password == null || gender == null) {
